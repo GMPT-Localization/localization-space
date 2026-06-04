@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Localization Space</title>
+<style>
+  :root{
+    --paper:#f4f1ea; --paper2:#ece7dc; --card:#fbf9f4;
+    --ink:#1c1b18; --muted:#6f6a60; --faint:#a39d90; --line:#d8d2c4;
+    --rust:#c0492a; --rust-dim:#e9c9bd; --teal:#0f6b62; --graphite:#2b2a27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:
+      radial-gradient(900px 500px at 88% -8%, rgba(15,107,98,.07), transparent 60%),
+      radial-gradient(800px 460px at -6% 4%, rgba(192,73,42,.06), transparent 55%),
+      var(--paper);
+    color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 80px;min-height:100vh}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  .serif{font-family:Georgia,"Iowan Old Style","Times New Roman",serif}
+  .mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace}
+
+  /* masthead */
+  header{padding:62px 0 30px;position:relative;display:flex;align-items:flex-start;gap:48px}
+  .hd-left{flex:none;max-width:560px}
+  .kick{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--rust);font-weight:700;
+    display:inline-flex;align-items:center;gap:9px}
+  .kick .pin{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
+  h1{font-size:52px;line-height:1.04;margin:16px 0 14px;font-weight:600;letter-spacing:-.02em}
+  h1 .em{font-style:italic;color:var(--rust)}
+  .lede{font-size:17px;color:var(--muted);max-width:560px}
+  .meta{margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;font-size:12.5px;color:var(--faint)}
+
+  /* bento */
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:14px;
+    grid-template-areas:
+      "notice notice notice dash  dash  dash"
+      "notice notice notice tools tools tools"
+      "proj   proj   proj   proj  proj  proj "
+      "qa     qa     qa    qa    qa    qa   "
+      "guide  guide  case   case  skill  skill"
+      "time   time   time  time  time  time  ";}
+  .tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;
+    background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;
+    text-decoration:none;color:inherit;overflow:hidden;min-height:150px;
+    opacity:0;transform:translateY(14px);
+    transition:opacity .5s ease,transform .55s cubic-bezier(.34,1.3,.5,1),box-shadow .28s ease,border-color .25s}
+  body.ready .tile{opacity:1;transform:translateY(0)}
+  .tile::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:3px;
+    background:var(--accent,var(--rust));transform:scaleY(0);transform-origin:center;transition:transform .3s cubic-bezier(.34,1.4,.5,1)}
+  .tile:hover,.tile:focus-visible{box-shadow:0 18px 40px rgba(40,35,25,.13);border-color:var(--rust-dim);transform:translateY(-4px)}
+  .tile:hover::before,.tile:focus-visible::before{transform:scaleY(1)}
+  .t-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;
+    background:rgba(192,73,42,.08);color:var(--accent,var(--rust));
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .25s}
+  .tile:hover .ic{transform:scale(1.08) rotate(-3deg);background:rgba(192,73,42,.14)}
+  .ic svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .arrow{color:var(--faint);font-size:18px;transition:transform .3s ease,color .25s;align-self:center}
+  .tile:hover .arrow{transform:translateX(5px);color:var(--rust)}
+  .t-name{font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:18px}
+  .t-name.serif{font-size:21px}
+  .t-desc{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.45;max-width:30ch}
+  .soon{position:absolute;top:16px;right:16px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:800;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:2px 8px;background:var(--paper2)}
+
+  /* tile placements + accents */
+  .notice{grid-area:notice;--accent:var(--rust)}
+  .dash{grid-area:dash;--accent:var(--teal)}
+  .tools{grid-area:tools;--accent:#7a5cc0}
+  .guide{grid-area:guide;--accent:#b9842a}
+  .case{grid-area:case;--accent:var(--teal)}
+  .skill{grid-area:skill;--accent:var(--rust)}
+  .time{grid-area:time;--accent:var(--rust)}
+  .proj{grid-area:proj;--accent:#7a5cc0}
+  .qa{grid-area:qa;--accent:var(--teal)}
+
+  /* notice feature: CHALK BLACKBOARD (warm charcoal to fit the page) */
+  .notice{padding:11px;background:linear-gradient(150deg,#43382a,#332a1f);border-color:#2c2419}
+  .notice::before{display:none}
+  .notice .soon{top:22px;right:22px;color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.18);background:rgba(0,0,0,.18)}
+  .slate{position:relative;flex:1;border-radius:11px;padding:26px 28px 24px;overflow:hidden;
+    background:
+      radial-gradient(120% 80% at 28% 8%, rgba(255,255,255,.045), transparent 50%),
+      radial-gradient(90% 70% at 82% 92%, rgba(255,255,255,.03), transparent 50%),
+      linear-gradient(160deg,#3a322a,#28221b);
+    box-shadow:inset 0 0 50px rgba(0,0,0,.45),inset 0 0 0 1.5px rgba(255,255,255,.04)}
+  .slate::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.7) .5px,transparent .6px);background-size:7px 7px}
+  .cb-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px}
+  .cb-title{font-family:inherit;font-weight:700;font-size:22px;color:#fdfcf7;
+    letter-spacing:-.01em;text-shadow:0 0 .6px rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.25)}
+  .cb-date{font-family:inherit;font-size:11px;color:#d7c8a8;opacity:.85;letter-spacing:.04em}
+  .cb-rule{width:100%;height:7px;margin:4px 0 15px;color:#efe6d2;opacity:.75}
+  .cb-list{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .cb-item{display:flex;align-items:baseline;gap:12px;font-family:inherit}
+  .cb-box{flex:none;align-self:center}
+  .cb-when{font-size:10px;min-width:54px;letter-spacing:.13em;text-transform:uppercase;opacity:.72}
+  .cb-what{font-size:14px;line-height:1.3;font-weight:500;text-shadow:0 0 .6px rgba(255,255,255,.2)}
+  .c-white{color:#fbfaf5}.c-blue{color:#b3d4dd}.c-pink{color:#ecb6c2}.c-green{color:#c6ddba}
+  .cb-trend{margin-top:16px;padding-top:12px;border-top:1.5px dashed rgba(255,255,255,.18);
+    font-family:inherit;font-size:12.5px;color:#ecd98a;letter-spacing:.01em}
+  .cb-trend b{color:#fdfcf7;font-weight:600}
+
+  /* timeline — slim banner */
+  .time{min-height:0;padding:0;overflow:hidden}
+  .time-banner{display:flex;align-items:center;gap:28px;padding:16px 24px;width:100%;height:100%}
+  .time-banner-left{flex:none}
+  .tb-name{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1}
+  .tb-tagline{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap}
+  .time-banner-stats{display:flex;gap:20px;flex:none}
+  .time-banner-stats .ts b{font-size:14px}
+  .time-banner-stats .ts span{font-size:9px}
+  .time-banner-mini{flex:1;position:relative;height:44px}
+  .time-banner-cta{flex:none;font-size:12px;font-weight:700;color:var(--rust);white-space:nowrap}
+  .mini{position:relative;height:44px}
+  .mini-rail{position:absolute;left:3%;right:3%;top:50%;height:3px;border-radius:2px;
+    background:linear-gradient(90deg,var(--teal),var(--rust));transform:translateY(-50%)}
+  .mini-dot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:var(--card);
+    border:2.5px solid var(--teal);transform:translate(-50%,-50%);transition:transform .3s}
+  .mini-dot.m{background:var(--rust);border-color:var(--rust)}
+  .mini-dot.live{background:var(--teal);border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,107,98,.2);animation:livepulse 2s ease-in-out infinite}
+  @keyframes livepulse{0%,100%{box-shadow:0 0 0 3px rgba(15,107,98,.2)}50%{box-shadow:0 0 0 6px rgba(15,107,98,.0)}}
+  .mini-lab{position:absolute;left:50%;transform:translateX(-50%);font-size:9px;color:var(--faint);white-space:nowrap;font-weight:700}
+  .mini-dot:nth-child(odd) ~ .mini-lab{}
+  .time:hover .mini-dot{animation:bob 1s ease}
+  @keyframes bob{50%{transform:translate(-50%,-50%) scale(1.3)}}
+
+  /* timeline tile stats */
+  .t-stats{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+  .ts{display:flex;flex-direction:column;gap:1px}
+  .ts b{font-size:17px;font-weight:800;color:var(--rust);letter-spacing:-.02em;line-height:1}
+  .ts span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+  .t-cta{font-size:12.5px;font-weight:700;color:var(--rust);margin-top:12px}
+  /* mini callout bubble */
+  .mini-bubble{position:absolute;transform:translateX(-50%);background:var(--rust);color:#fff;
+    font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;white-space:nowrap;letter-spacing:.04em}
+  .mini-bubble::after{content:"";position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);
+    border:4px solid transparent;border-top-color:var(--rust);border-bottom:none}
+
+  /* ── DASHBOARD TILE ──────────────────────────────────── */
+  .dash{padding:18px 18px 14px;display:flex;flex-direction:column;gap:10px;
+    background:linear-gradient(150deg,#f7f5ef,#eef9f7)}
+  .db-top{display:flex;align-items:center;justify-content:space-between}
+  .db-label{font-size:16px;font-weight:700;letter-spacing:-.01em}
+  .db-live{font-size:9px;letter-spacing:.14em;color:var(--teal);font-weight:700;
+    background:rgba(15,107,98,.1);border:1px solid rgba(15,107,98,.2);
+    border-radius:999px;padding:2px 8px;animation:livepulse 2s ease-in-out infinite}
+  .db-charts{display:flex;gap:10px;align-items:flex-end;flex:1}
+  .db-chart-block{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+  .db-chart-mid{flex:0.8}
+  .db-chart-label{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--faint);font-weight:700}
+  /* bar chart */
+  .db-bars{display:flex;align-items:flex-end;gap:3px;height:52px;width:100%}
+  .db-bar{flex:1;background:rgba(15,107,98,.2);border-radius:2px 2px 0 0;
+    height:var(--h);transition:height .4s ease}
+  .db-bar-hi{background:var(--teal)}
+  .dash:hover .db-bar{filter:brightness(1.08)}
+  /* donut */
+  .db-donut{width:52px;height:52px}
+  /* sparkline */
+  .db-spark{width:100%;height:52px}
+  .db-links{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;border-top:1px solid var(--line);padding-top:8px}
+  .db-link{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;
+    color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:7px;
+    border:1px solid transparent;transition:background .18s,border-color .18s,color .18s}
+  .db-link svg{flex:none;color:var(--teal);opacity:.7;transition:opacity .18s}
+  .db-link:hover{background:rgba(15,107,98,.07);border-color:rgba(15,107,98,.2);color:var(--teal)}
+  .db-link:hover svg{opacity:1}
+
+  /* ── TOOLS — mechanical toolbox ──────────────────────── */
+  .toolbox-tile{padding:0;overflow:hidden;background:linear-gradient(150deg,#f7f5ef,#eef9f7);border-color:var(--line);cursor:default}
+  .toolbox-tile::before{display:none}
+  .toolbox-wrap{position:relative;height:100%;display:flex;flex-direction:column;
+    background:
+      repeating-linear-gradient(0deg,rgba(15,107,98,.03) 0px,rgba(15,107,98,.03) 1px,transparent 1px,transparent 28px),
+      repeating-linear-gradient(90deg,rgba(15,107,98,.03) 0px,rgba(15,107,98,.03) 1px,transparent 1px,transparent 28px),
+      linear-gradient(150deg,#f7f5ef,#eef9f7)}
+  /* bolt corners */
+  .bolt{position:absolute;width:7px;height:7px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#ccc7bc,#a8a29a);
+    border:1px solid var(--line);z-index:2}
+  .bolt.tl{top:8px;left:8px} .bolt.tr{top:8px;right:8px}
+  .bolt.bl{bottom:8px;left:8px} .bolt.br{bottom:8px;right:8px}
+  /* header plate */
+  .toolbox-header{display:flex;align-items:center;gap:8px;
+    padding:10px 18px;background:rgba(15,107,98,.06);border-bottom:1px solid var(--line)}
+  .toolbox-header svg{color:var(--teal);flex:none}
+  .toolbox-title{font-size:11px;letter-spacing:.22em;color:var(--ink);font-weight:700;flex:1}
+  .toolbox-badge{font-size:8.5px;letter-spacing:.14em;color:var(--faint);background:rgba(15,107,98,.06);
+    border:1px solid var(--line);border-radius:3px;padding:2px 6px}
+  /* drawers */
+  .toolbox-drawers{display:flex;flex-direction:column;flex:1;padding:8px 10px;gap:5px}
+  .drawer{display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:6px;
+    padding:8px 10px;text-decoration:none;color:var(--ink);
+    transition:background .18s,border-color .18s,transform .15s;
+    position:relative}
+  a.drawer:hover{background:#fff;border-color:var(--teal);transform:translateX(2px)}
+  .drawer-dim{opacity:.45;cursor:default}
+  .drawer-slot{width:30px;height:30px;border-radius:5px;
+    background:rgba(15,107,98,.07);border:1px solid var(--line);
+    display:grid;place-items:center;flex:none;color:var(--teal)}
+  a.drawer:hover .drawer-slot{background:rgba(15,107,98,.13);border-color:var(--teal)}
+  .drawer-info{flex:1;min-width:0}
+  .drawer-name{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .drawer-desc{font-size:9.5px;letter-spacing:.1em;color:var(--faint);margin-top:1px}
+  .drawer-tag{font-size:11px;color:var(--faint);flex:none;transition:color .18s}
+  a.drawer:hover .drawer-tag{color:var(--teal)}
+  .soon-pill{font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--paper2);border:1px solid var(--line);border-radius:3px;
+    padding:2px 5px;color:var(--faint);font-family:monospace}
+
+  /* ── SHARED BOOK/COVER PHYSICS ───────────────────────── */
+  .guide,.case,.skill{
+    border-radius:0;
+    overflow:visible;
+    border:none;
+    min-height:120px;
+    /* resting shadow: contact shadow close + ambient lift */
+    box-shadow:
+      1px 2px 0 rgba(0,0,0,.18),
+      2px 4px 0 rgba(0,0,0,.10),
+      0 8px 20px rgba(0,0,0,.13),
+      0 20px 40px rgba(0,0,0,.08);
+    transition:box-shadow .32s ease,transform .38s cubic-bezier(.34,1.3,.5,1);
+  }
+  /* page-stack edge: cream strips peeking behind bottom-right */
+  .guide::after,.case::after,.skill::after{
+    content:"";position:absolute;inset:0;z-index:-1;
+    background:inherit;
+    box-shadow:
+      3px 3px 0 #ddd8ce,
+      6px 6px 0 #d3cdc3,
+      9px 9px 0 #cac4b9,
+      9px 9px 14px rgba(0,0,0,.14);
+  }
+  /* override generic tile hover for cover tiles */
+  .guide:hover,.case:hover,.skill:hover,
+  .guide:focus-visible,.case:focus-visible,.skill:focus-visible{
+    transform:translateY(-7px) rotate(-.4deg);
+    border-color:transparent;
+    box-shadow:
+      2px 3px 0 rgba(0,0,0,.16),
+      4px 7px 0 rgba(0,0,0,.09),
+      0 16px 36px rgba(0,0,0,.18),
+      0 32px 56px rgba(0,0,0,.1);
+  }
+  .guide:hover::after,.case:hover::after,.skill:hover::after,
+  .guide:focus-visible::after,.case:focus-visible::after,.skill:focus-visible::after{
+    box-shadow:
+      4px 4px 0 #ddd8ce,
+      8px 8px 0 #d3cdc3,
+      12px 12px 0 #cac4b9,
+      12px 18px 20px rgba(0,0,0,.18);
+  }
+
+  /* ── MANUAL COVER (guidelines) ───────────────────────── */
+  .guide{padding:0}
+  .manual-cover{display:flex;flex-direction:column;height:100%;min-height:120px;overflow:hidden}
+  .mc-band{display:flex;justify-content:space-between;align-items:center;
+    background:var(--graphite);color:rgba(255,255,255,.85);
+    padding:8px 16px;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+  .mc-ed{color:rgba(255,255,255,.45);font-size:9px;letter-spacing:.1em}
+  .mc-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+    padding:10px 14px 8px;background:var(--card);
+    border-left:5px solid var(--accent,#b9842a);
+    /* subtle cover gloss */
+    background-image:linear-gradient(160deg,rgba(255,255,255,.06) 0%,transparent 60%)}
+  .mc-icon-row{color:var(--accent,#b9842a);margin-bottom:8px}
+  .mc-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .mc-sub{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-top:4px;font-weight:600}
+  .mc-footer{background:var(--accent,#b9842a);padding:6px 18px;display:flex;align-items:center}
+  .mc-tag{font-size:9px;color:rgba(255,255,255,.8);letter-spacing:.16em}
+  .guide::before{display:none}
+
+  /* ── BOOK COVER (case studies) ────────────────────────── */
+  .case{padding:0;background:linear-gradient(145deg,#0e5750,#0f6b62)}
+  .case::before{display:none}
+  /* page edges for dark cover show as lighter parchment */
+  .case::after{background:linear-gradient(145deg,#0e5750,#0f6b62)}
+  .bk-spine{position:absolute;left:0;top:0;bottom:0;width:13px;
+    background:linear-gradient(180deg,#07302c,#0a4a44);
+    border-right:1px solid rgba(255,255,255,.06);
+    box-shadow:inset -2px 0 6px rgba(0,0,0,.3)}
+  .bk-inner{flex:1;padding:10px 14px 12px 28px;display:flex;flex-direction:column;justify-content:space-between;height:100%;
+    background-image:linear-gradient(160deg,rgba(255,255,255,.05) 0%,transparent 55%)}
+  .bk-genre{font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+  .bk-title{font-size:26px;font-weight:700;line-height:1.05;color:#fdfcf7;letter-spacing:-.02em;margin-top:6px}
+  .bk-rule{width:32px;height:2px;background:rgba(255,255,255,.28);margin:10px 0}
+  .bk-blurb{font-size:11px;color:rgba(255,255,255,.58);line-height:1.45;max-width:20ch}
+  .bk-author{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-top:10px}
+
+  /* ── TEXTBOOK COVER (upskilling) ──────────────────────── */
+  .skill{padding:0}
+  .skill::before{display:none}
+  .textbook-cover{display:flex;flex-direction:column;height:100%;min-height:120px;overflow:hidden}
+  .tb-header{position:relative;padding:9px 16px 8px;
+    background:var(--rust);display:flex;align-items:center;gap:10px;
+    box-shadow:inset 0 -2px 6px rgba(0,0,0,.15)}
+  .tb-stripe{flex:1;height:2px;background:rgba(255,255,255,.32);border-radius:2px}
+  .tb-edition{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.8);white-space:nowrap}
+  .tb-body{flex:1;padding:10px 14px 6px;background:var(--card);
+    border-left:4px solid var(--rust);
+    background-image:linear-gradient(160deg,rgba(255,255,255,.07) 0%,transparent 55%)}
+  .tb-title{font-size:17px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+  .tb-subtitle{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4;max-width:22ch}
+  .tb-figure{padding:0 14px 4px;background:var(--card);display:flex;justify-content:flex-end}
+  .tb-footer{background:#ede7db;border-top:2px solid var(--rust);
+    padding:5px 16px;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rust);font-weight:700}
+
+  /* ── VISION / MISSION ────────────────────────────────── */
+  .vm-bg{flex:1;pointer-events:none;user-select:none;
+    display:flex;flex-direction:column;gap:14px;
+    padding-top:0;
+    border-left:1px solid var(--line);padding-left:36px}
+  .vm-line{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+    font-size:15px;font-style:italic;line-height:1.65;color:var(--ink);
+    opacity:.55;letter-spacing:-.005em}
+  .vm-kicker{display:block;font-style:normal;font-weight:700;font-size:9px;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--rust);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    margin-bottom:3px;opacity:.8}
+
+  /* ── PROJECT HIGHLIGHTS TILE ─────────────────────────── */
+  .proj{padding:18px 20px 16px;display:flex;flex-direction:column;gap:12px;min-height:0}
+  .ph-layout{display:flex;flex-direction:column;gap:12px;height:100%}
+  .ph-header{display:flex;justify-content:space-between;align-items:flex-start}
+  .ph-label{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+  .ph-title{font-size:16px;font-weight:700;letter-spacing:-.01em}
+  .ph-cards{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .ph-cards::-webkit-scrollbar{display:none}
+  .ph-card{flex:none;width:200px;background:var(--paper2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;display:flex;flex-direction:column;gap:6px;
+    transition:border-color .2s,background .2s}
+  .proj:hover .ph-card{background:#f5f2ec;border-color:#ccc7bb}
+  .ph-status{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    border-radius:4px;padding:2px 7px;width:fit-content}
+  .ph-launching{background:rgba(192,73,42,.1);color:var(--rust)}
+  .ph-inprog{background:rgba(122,92,192,.1);color:#7a5cc0}
+  .ph-ontrack{background:rgba(15,107,98,.1);color:var(--teal)}
+  .ph-cname{font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.2}
+  .ph-cnote{font-size:10.5px;color:var(--muted);line-height:1.4}
+
+  /* ── Q&A AGENT TILE ──────────────────────────────────── */
+  .qa{padding:0;overflow:hidden;cursor:default;min-height:auto}
+  .qa:hover{transform:none;box-shadow:none;border-color:var(--line)}
+  .qa::before{display:none}
+  .qa-layout{display:grid;grid-template-columns:340px 1fr;height:100%;min-height:220px}
+  .qa-left{padding:22px 24px;display:flex;flex-direction:column;gap:14px;border-right:1px solid var(--line)}
+  .qa-header{display:flex;align-items:flex-start;gap:12px}
+  .qa-icon{width:36px;height:36px;border-radius:10px;background:rgba(15,107,98,.1);
+    display:grid;place-items:center;flex:none}
+  .qa-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .qa-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .qa-chips{display:flex;flex-direction:column;gap:6px}
+  .qa-chip{background:var(--paper2);border:1px solid var(--line);border-radius:8px;
+    padding:7px 12px;font-size:12px;color:var(--ink);text-align:left;cursor:pointer;
+    transition:background .18s,border-color .18s,color .18s;font-family:inherit;line-height:1.3}
+  .qa-chip:hover{background:rgba(15,107,98,.08);border-color:var(--teal);color:var(--teal)}
+  .qa-chip.qa-chip-active{background:rgba(15,107,98,.12);border-color:var(--teal);color:var(--teal);font-weight:600}
+  .qa-input-row{display:flex;gap:8px;margin-top:auto}
+  .qa-input{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 12px;
+    font-size:12.5px;font-family:inherit;background:var(--card);color:var(--ink);outline:none;
+    transition:border-color .2s}
+  .qa-input:focus{border-color:var(--teal)}
+  .qa-send{width:34px;height:34px;border-radius:8px;border:none;background:var(--teal);
+    color:#fff;cursor:pointer;display:grid;place-items:center;flex:none;
+    transition:background .2s,transform .15s}
+  .qa-send:hover{background:#0a5a52;transform:scale(1.05)}
+  /* chat area */
+  .qa-right{padding:18px 22px;display:flex;flex-direction:column;
+    background:linear-gradient(160deg,#f7f5ef,#f2efe8);overflow-y:auto;max-height:280px}
+  .qa-chat{display:flex;flex-direction:column;gap:12px;flex:1;justify-content:flex-end}
+  .qa-bubble{display:flex;align-items:flex-start;gap:9px}
+  .qa-bubble-user{flex-direction:row-reverse}
+  .qa-bubble-text{font-size:13px;line-height:1.55;padding:9px 13px;border-radius:12px;max-width:420px}
+  .qa-bubble-bot .qa-bubble-text{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:4px 12px 12px 12px}
+  .qa-bubble-user .qa-bubble-text{background:var(--teal);color:#fff;border-radius:12px 4px 12px 12px}
+  .qa-bot-avatar{width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;
+    font-size:9px;font-weight:800;letter-spacing:.04em;display:grid;place-items:center;flex:none;
+    font-family:inherit;margin-top:1px}
+  .qa-user-avatar{width:26px;height:26px;border-radius:50%;background:var(--graphite);color:#fff;
+    font-size:9px;font-weight:800;display:grid;place-items:center;flex:none;margin-top:1px}
+  .qa-typing{display:flex;gap:4px;align-items:center;padding:10px 14px}
+  .qa-typing span{width:6px;height:6px;border-radius:50%;background:var(--faint);
+    animation:typing-dot 1.2s ease-in-out infinite}
+  .qa-typing span:nth-child(2){animation-delay:.2s}
+  .qa-typing span:nth-child(3){animation-delay:.4s}
+  @keyframes typing-dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1);opacity:1}}
+  .qa-bubble{opacity:0;transform:translateY(6px);animation:bubble-in .3s ease forwards}
+  @keyframes bubble-in{to{opacity:1;transform:translateY(0)}}
+  .qa-intro{opacity:1;transform:none;animation:none}
+
+  footer{margin-top:34px;color:var(--muted);font-size:12.5px;text-align:center}
+  .wm{position:fixed;bottom:14px;right:18px;font-size:10px;color:rgba(0,0,0,.3);letter-spacing:.14em;font-family:monospace;pointer-events:none}
+
+  @media(max-width:900px){
+    .bento{grid-template-columns:1fr 1fr;grid-template-areas:
+      "notice notice" "time time" "dash tools" "guide case" "skill skill"}
+    h1{font-size:38px}
+    .time{flex-direction:column;align-items:stretch}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hd-left">
+      <div class="kick"><span class="pin"></span>GMPT · Localization</div>
+      <h1 class="serif">Localization <span class="em">Space</span></h1>
+      <p class="lede">A shared space for the <strong>localization team</strong> to store, organize, and surface assets — and for <strong>XFN partners</strong> to understand localization and gain insights with ease.</p>
+    </div>
+    <div class="vm-bg" aria-hidden="true">
+      <div class="vm-line"><em class="vm-kicker">Vision</em> Become the leading force in driving effective communication and connection for businesses with global audiences through exceptional product localization.</div>
+      <div class="vm-line"><em class="vm-kicker">Mission</em> Deliver brand consistent product content that is tailored to each market, ensuring a seamless experience for businesses to reach a global audience and build meaningful connections.</div>
+    </div>
+  </header>
+
+  <main class="bento">
+
+    <!-- NOTICE BOARD · chalk blackboard -->
+    <a class="tile notice" href="#" data-soon>
+      <span class="soon">Soon</span>
+      <div class="slate">
+        <div class="cb-head">
+          <div class="cb-title">Notice board</div>
+          <div class="cb-date">week of Jun 2, 2026</div>
+        </div>
+        <svg class="cb-rule" viewBox="0 0 800 8" preserveAspectRatio="none"><path d="M1 4 Q 400 2.5 799 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        <ul class="cb-list">
+          <li class="cb-item">
+            <span class="cb-box" style="font-size:15px;color:#ecd98a">🏆</span>
+            <span class="cb-when c-white">Jun 2</span>
+            <span class="cb-what c-white">Q1 2026 Inspire Awards — Symphony, Biz Profile & GMV Max wins</span>
+          </li>
+          <li class="cb-item">
+            <span class="cb-box" style="font-size:15px;color:#b3d4dd">✦</span>
+            <span class="cb-when c-blue">Jun 2</span>
+            <span class="cb-what c-blue">Figma AI Training — 60 min session with Figma Enterprise</span>
+          </li>
+          <li class="cb-item">
+            <span class="cb-box" style="font-size:15px;color:#c6ddba">●</span>
+            <span class="cb-when c-green">May 26</span>
+            <span class="cb-what c-green">Figma AI Usage Guide &amp; Guardrails published</span>
+          </li>
+          <li class="cb-item">
+            <span class="cb-box" style="font-size:15px;color:#ecb6c2">♥</span>
+            <span class="cb-when c-pink">May 19</span>
+            <span class="cb-what c-pink">Welcome new Content Designer to the team!</span>
+          </li>
+        </ul>
+        <div class="cb-trend">↗ Trending: <b>Figma AI</b>, <b>Stakeholder Self-Serve tools</b></div>
+      </div>
+    </a>
+
+    <!-- DASHBOARD -->
+    <div class="tile dash" style="cursor:default">
+      <div class="db-top">
+        <div class="db-label">Dashboard</div>
+        <span class="db-live mono">● LIVE</span>
+      </div>
+      <!-- mini chart area -->
+      <div class="db-charts">
+        <div class="db-chart-block">
+          <div class="db-bars">
+            <div class="db-bar" style="--h:45%"></div>
+            <div class="db-bar" style="--h:70%"></div>
+            <div class="db-bar" style="--h:55%"></div>
+            <div class="db-bar" style="--h:85%"></div>
+            <div class="db-bar" style="--h:60%"></div>
+            <div class="db-bar db-bar-hi" style="--h:95%"></div>
+            <div class="db-bar" style="--h:72%"></div>
+          </div>
+          <div class="db-chart-label mono">Volume</div>
+        </div>
+        <div class="db-chart-block db-chart-mid">
+          <svg class="db-donut" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="13" fill="none" stroke="rgba(15,107,98,.15)" stroke-width="5"/>
+            <circle cx="18" cy="18" r="13" fill="none" stroke="var(--teal)" stroke-width="5"
+              stroke-dasharray="52 30" stroke-dashoffset="9" stroke-linecap="round"/>
+            <circle cx="18" cy="18" r="13" fill="none" stroke="var(--rust)" stroke-width="5"
+              stroke-dasharray="22 60" stroke-dashoffset="-43" stroke-linecap="round"/>
+            <text x="18" y="21" text-anchor="middle" font-size="7" font-weight="700" fill="var(--teal)" font-family="monospace">63%</text>
+          </svg>
+          <div class="db-chart-label mono">Quality</div>
+        </div>
+        <div class="db-chart-block">
+          <svg class="db-spark" viewBox="0 0 60 32" preserveAspectRatio="none">
+            <polyline points="0,28 10,22 18,24 26,14 34,18 42,8 52,10 60,4"
+              fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="0,28 10,22 18,24 26,14 34,18 42,8 52,10 60,4 60,32 0,32"
+              fill="url(#sparkfill)" stroke="none"/>
+            <defs><linearGradient id="sparkfill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--teal)" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="var(--teal)" stop-opacity="0"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="db-chart-label mono">Trend ↑</div>
+        </div>
+      </div>
+      <!-- metric links -->
+      <div class="db-links">
+        <a class="db-link" href="https://bytedance.sg.larkoffice.com/share/base/dashboard/shrlgscWTiKWAxN0fdfas4utoxb" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12A10 10 0 1112 2"/><path d="M22 2L12 12M16 2h6v6"/></svg>
+          Quality metrics
+        </a>
+        <a class="db-link" href="https://bytedance.sg.larkoffice.com/share/base/dashboard/shrlgscWTiKWAxN0fdfas4utoxb" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg>
+          Financial metrics
+        </a>
+        <a class="db-link" href="https://bytedance.sg.larkoffice.com/share/base/dashboard/shrlgscWTiKWAxN0fdfas4utoxb" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Demography &amp; Impact
+        </a>
+        <a class="db-link" href="https://bytedance.sg.larkoffice.com/share/base/dashboard/shrlgscWTiKWAxN0fdfas4utoxb" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Productivity
+        </a>
+      </div>
+    </div>
+
+    <!-- TOOLS — mechanical toolbox -->
+    <div class="tile tools toolbox-tile">
+      <div class="toolbox-wrap">
+        <!-- bolt corners -->
+        <span class="bolt tl"></span><span class="bolt tr"></span>
+        <span class="bolt bl"></span><span class="bolt br"></span>
+        <!-- header plate -->
+        <div class="toolbox-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          <span class="toolbox-title mono">TOOLBOX</span>
+          <span class="toolbox-badge mono">4 TOOLS</span>
+        </div>
+        <!-- tool drawer grid -->
+        <div class="toolbox-drawers">
+          <a class="drawer" href="https://8080-35cff653b9494fed8fea4d2c6ae46f7b-cube-kubestrato-online6.code-server.strato-https-proxy.bytedance.net/" target="_blank">
+            <div class="drawer-slot">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </div>
+            <div class="drawer-info">
+              <div class="drawer-name">Content Search</div>
+              <div class="drawer-desc mono">search · loc content</div>
+            </div>
+            <span class="drawer-tag">↗</span>
+          </a>
+          <a class="drawer" href="https://data.bytedance.net/aeolus/pages/dashboard/923616?appId=1004255&sheetId=1080230" target="_blank">
+            <div class="drawer-slot">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </div>
+            <div class="drawer-info">
+              <div class="drawer-name">Feature Map</div>
+              <div class="drawer-desc mono">product · coverage</div>
+            </div>
+            <span class="drawer-tag">↗</span>
+          </a>
+          <div class="drawer drawer-dim">
+            <div class="drawer-slot">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+            <div class="drawer-info">
+              <div class="drawer-name">Uploader</div>
+              <div class="drawer-desc mono">asset sync · shared</div>
+            </div>
+            <span class="drawer-tag soon-pill">soon</span>
+          </div>
+          <div class="drawer drawer-dim">
+            <div class="drawer-slot">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+            </div>
+            <div class="drawer-info">
+              <div class="drawer-name">Sync Bot</div>
+              <div class="drawer-desc mono">lark bot · routing</div>
+            </div>
+            <span class="drawer-tag soon-pill">soon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GUIDELINES — manual cover -->
+    <a class="tile guide" href="#" data-soon>
+      <span class="soon">Soon</span>
+      <div class="manual-cover">
+        <div class="mc-band">
+          <span class="mc-org">GMPT LOCALIZATION</span>
+          <span class="mc-ed mono">Ed. 2026</span>
+        </div>
+        <div class="mc-body">
+          <div class="mc-icon-row">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2z"/><path d="M9 8h6M9 12h6"/><path d="M17 15l1.2 1.2L21 13"/></svg>
+          </div>
+          <div class="mc-title">Guidelines</div>
+          <div class="mc-sub">Standards & Best Practices</div>
+        </div>
+        <div class="mc-footer">
+          <span class="mc-tag mono">· agent-assisted ·</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- CASE STUDIES — book cover -->
+    <a class="tile case" href="#" data-soon>
+      <span class="soon">Soon</span>
+      <div class="book-cover">
+        <div class="bk-spine"></div>
+        <div class="bk-inner">
+          <div class="bk-genre mono">Localization · Vol. I</div>
+          <div class="bk-title serif">Case<br>Studies</div>
+          <div class="bk-rule"></div>
+          <div class="bk-blurb">Deep dives &amp; retrospectives — what worked and why.</div>
+          <div class="bk-author mono">GMPT Team</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- UPSKILLING — textbook -->
+    <a class="tile skill" href="#" data-soon>
+      <span class="soon">Soon</span>
+      <div class="textbook-cover">
+        <div class="tb-header">
+          <div class="tb-edition mono">Third Edition</div>
+          <div class="tb-stripe"></div>
+        </div>
+        <div class="tb-body">
+          <div class="tb-title">Upskilling<br>&amp; Training</div>
+          <div class="tb-subtitle">A Practical Guide for the Localization Team</div>
+        </div>
+        <div class="tb-figure">
+          <svg width="48" height="38" viewBox="0 0 48 38" fill="none"><rect x="2" y="6" width="20" height="26" rx="2" fill="rgba(192,73,42,.15)" stroke="var(--rust)" stroke-width="1.5"/><rect x="14" y="2" width="20" height="26" rx="2" fill="rgba(192,73,42,.1)" stroke="var(--rust)" stroke-width="1.5"/><rect x="26" y="10" width="20" height="26" rx="2" fill="rgba(192,73,42,.18)" stroke="var(--rust)" stroke-width="1.5"/><path d="M6 14h12M6 18h8M18 16h18M18 20h12M30 18h12M30 22h8" stroke="var(--rust)" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></svg>
+        </div>
+        <div class="tb-footer mono">GMPT · Localization Series</div>
+      </div>
+    </a>
+
+    <!-- PROJECT HIGHLIGHTS -->
+    <a class="tile proj" href="https://bytedance.sg.larkoffice.com/docx/H2QLdjhdcon0Q6xhafalVAJzgJg" target="_blank">
+      <div class="ph-layout">
+        <div class="ph-header">
+          <div class="ph-titles">
+            <div class="ph-label mono">Weekly · Jun 1, 2026</div>
+            <div class="ph-title">Project Highlights</div>
+          </div>
+          <span class="arrow" style="font-size:15px;align-self:center">↗</span>
+        </div>
+        <div class="ph-cards">
+          <div class="ph-card">
+            <span class="ph-status ph-launching">🚀 Launching</span>
+            <div class="ph-cname">[TTAM] 11 New Languages</div>
+            <div class="ph-cnote">1st translation done · QA by mid-June · Launch 6/15</div>
+          </div>
+          <div class="ph-card">
+            <span class="ph-status ph-inprog">⚙ In Progress</span>
+            <div class="ph-cname">AIPE Research</div>
+            <div class="ph-cnote">Awaiting May LQA scores · Next: Javanese, pt-PT, Filipino</div>
+          </div>
+          <div class="ph-card">
+            <span class="ph-status ph-inprog">⚙ In Progress</span>
+            <div class="ph-cname">Athena Platform Revamp</div>
+            <div class="ph-cnote">Smart submission translated · 3-step Starling migration confirmed</div>
+          </div>
+          <div class="ph-card">
+            <span class="ph-status ph-ontrack">✓ On Track</span>
+            <div class="ph-cname">TM Cleanup</div>
+            <div class="ph-cnote">TikTok_Ads + Ads_manager_core kick-off · Est. done end of July</div>
+          </div>
+          <div class="ph-card">
+            <span class="ph-status ph-ontrack">✓ On Track</span>
+            <div class="ph-cname">Vendor Management</div>
+            <div class="ph-cnote">Non-Starling task Bitable tracker created</div>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Q&A AGENT -->
+    <div class="tile qa" id="qa-tile">
+      <div class="qa-layout">
+        <div class="qa-left">
+          <div class="qa-header">
+            <div class="qa-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div>
+              <div class="qa-title">Ask the Team Agent</div>
+              <div class="qa-sub">Instant answers about your localization team &amp; workflow</div>
+            </div>
+          </div>
+          <div class="qa-chips" id="qa-chips">
+            <button class="qa-chip" data-q="Who is my Content Designer?">Who is my Content Designer?</button>
+            <button class="qa-chip" data-q="Who is my Localization Project Manager?">Who is my LPM?</button>
+            <button class="qa-chip" data-q="What tools does the team use?">What tools do we use?</button>
+            <button class="qa-chip" data-q="How do I submit a localization request?">How to submit a request?</button>
+            <button class="qa-chip" data-q="What languages do we support?">What languages do we support?</button>
+          </div>
+          <div class="qa-input-row">
+            <input class="qa-input" id="qa-input" type="text" placeholder="Ask anything about the team or workflow…" autocomplete="off"/>
+            <button class="qa-send" id="qa-send" aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="qa-right">
+          <div class="qa-chat" id="qa-chat">
+            <div class="qa-bubble qa-bubble-bot qa-intro">
+              <span class="qa-bot-avatar">AI</span>
+              <div class="qa-bubble-text">Hi! I'm your localization team agent. Click a question on the left or type your own — I'll find the answer instantly.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE — slim full-width banner -->
+    <a class="tile time" href="timeline-spine.html">
+      <div class="time-banner">
+        <div class="time-banner-left">
+          <div class="tb-name serif">The Automation Journey</div>
+          <div class="tb-tagline">2023 → 2026 · Nine milestones to a fully automated localization workflow</div>
+        </div>
+        <div class="time-banner-stats">
+          <div class="ts"><b>17 → 8</b><span>steps</span></div>
+          <div class="ts"><b>4 → 2</b><span>platforms</span></div>
+          <div class="ts"><b>−1 day</b><span>pickup</span></div>
+        </div>
+        <div class="time-banner-mini" id="mini"></div>
+        <div class="time-banner-cta">Explore the timeline ↗</div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>Localization Space · a launchpad for the GMPT localization team. Tiles marked “Soon” are placeholders ready to be wired to real content.</footer>
+</div>
+<div class="wm">Created by Huashu-Design</div>
+
+<script>
+// mini timeline preview inside the Timeline tile
+const mini = [
+  {m:1},{m:0},{m:1},{m:0},{m:1},{m:1},{m:0},{m:0},{m:1},{m:1,active:true}
+];
+const host=document.getElementById('mini')||document.querySelector('.time-banner-mini');
+const rail=document.createElement('div');rail.className='mini-rail';host.appendChild(rail);
+mini.forEach((d,i)=>{
+  const x=4+(i/(mini.length-1))*92;
+  const dot=document.createElement('div');
+  dot.className='mini-dot'+(d.m?' m':'')+(d.active?' live':'');
+  dot.style.left=x+'%';dot.style.transitionDelay=(i*0.04)+'s';
+  host.appendChild(dot);
+});
+// slim banner: year labels only, below rail
+[['2023',4],['Now',96]].forEach(([t,x])=>{
+  const l=document.createElement('div');l.className='mini-lab';l.style.left=x+'%';
+  l.style.top='70%';l.style.fontSize='8px';l.textContent=t;host.appendChild(l);
+});
+// Q&A agent demo
+const qaAnswers = {
+  "Who is my Content Designer?": "Each product is assigned a dedicated Content Designer based on coverage. Check this link to find the latest product coverage map: <a href='https://bytedance.larkoffice.com/wiki/wikcnWpkgxKlmDrRElKhvZ5rGld#share-EAWYdBhQuojVxAxYKt6u3teMsbh' target='_blank' style='color:var(--teal);text-decoration:underline;font-weight:600'>Product Coverage Map →</a>",
+  "Who is my Localization Project Manager?": "LPMs are assigned by product and market. Check this sheet to find your dedicated LPM: <a href='https://bytedance.sg.larkoffice.com/sheets/C7RKsGDWJhcKiHt1Bidle4jZgNf?sheet=O0TQzt' target='_blank' style='color:var(--teal);text-decoration:underline;font-weight:600'>LPM Assignment Sheet →</a>",
+  "What tools does the team use?": "The team runs on <b>Lark Base</b> (tracker + dashboard), a custom <b>Lark Bot</b> for task routing, <b>Phrase TMS</b> for translation memory, and an in-house <b>uploader</b> for asset sync. More tools coming soon in the Tools tile!",
+  "How do I submit a localization request?": "Head to the <b>Lark Base tracker</b> and fill in the intake form — product name, target markets, word count estimate, and deadline. The bot will auto-assign your LPM and notify the team within the hour.",
+  "What languages do we support?": "Currently <b>22 languages</b> across Southeast Asia, East Asia, and EMEA — including ID, TH, VI, MS, KO, JA, PT-BR, DE, FR, AR and more. Reach out to your LPM to request a new locale."
+};
+const fallback = "Great question! This is a demo — in the live agent I'd search the team wiki, Lark Base, and org chart to find you a precise answer in seconds.";
+
+function qaAddBubble(chat, text, isUser) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qa-bubble ' + (isUser ? 'qa-bubble-user' : 'qa-bubble-bot');
+  const avatar = document.createElement('div');
+  avatar.className = isUser ? 'qa-user-avatar' : 'qa-bot-avatar';
+  avatar.textContent = isUser ? 'You' : 'AI';
+  const bubble = document.createElement('div');
+  bubble.className = 'qa-bubble-text';
+  bubble.innerHTML = text;
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+  return wrap;
+}
+
+function qaRespond(question) {
+  const chat = document.getElementById('qa-chat');
+  const chips = document.querySelectorAll('.qa-chip');
+  chips.forEach(c => c.classList.toggle('qa-chip-active', c.dataset.q === question));
+
+  qaAddBubble(chat, question, true);
+
+  // typing indicator
+  const typingWrap = document.createElement('div');
+  typingWrap.className = 'qa-bubble qa-bubble-bot';
+  typingWrap.style.animation = 'none'; typingWrap.style.opacity = '1';
+  const typingAvatar = document.createElement('div');
+  typingAvatar.className = 'qa-bot-avatar'; typingAvatar.textContent = 'AI';
+  const typing = document.createElement('div');
+  typing.className = 'qa-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  typingWrap.appendChild(typingAvatar);
+  typingWrap.appendChild(typing);
+  chat.appendChild(typingWrap);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    typingWrap.remove();
+    const answer = Object.keys(qaAnswers).find(k => k.toLowerCase() === question.toLowerCase())
+      ? qaAnswers[Object.keys(qaAnswers).find(k => k.toLowerCase() === question.toLowerCase())]
+      : fallback;
+    qaAddBubble(chat, answer, false);
+  }, 1100);
+}
+
+document.getElementById('qa-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.qa-chip');
+  if (chip) qaRespond(chip.dataset.q);
+});
+document.getElementById('qa-send').addEventListener('click', () => {
+  const input = document.getElementById('qa-input');
+  const val = input.value.trim();
+  if (val) { qaRespond(val); input.value = ''; }
+});
+document.getElementById('qa-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('qa-send').click();
+});
+
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  // stagger tile reveal
+  document.querySelectorAll('.tile').forEach((t,i)=>t.style.transitionDelay=(0.05+i*0.07)+'s');
+  document.body.classList.add('ready');
+}));
+</script>
+</body>
+</html>
