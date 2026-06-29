@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok for Business — Platform Relation Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f5f0; --card:#ffffff; --ink:#2c2c2a; --muted:#5f5e5a; --line:#e3e1d8;
+    --purple-f:#eeedfe; --purple-s:#534ab7; --purple-t:#3c3489;
+    --teal-f:#e1f5ee; --teal-s:#0f6e56; --teal-t:#085041;
+    --coral-f:#faece7; --coral-s:#993c1d; --coral-t:#712b13;
+    --blue-f:#e6f1fb; --blue-s:#185fa5; --blue-t:#0c447c;
+    --gray-f:#f1efe8; --gray-s:#5f5e5a; --gray-t:#2c2c2a;
+    --conn:#9a988f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 80px;}
+  header h1{font-size:30px;font-weight:600;margin:0 0 8px;letter-spacing:-0.01em;}
+  header p{font-size:16px;color:var(--muted);margin:0 0 4px;max-width:760px;}
+  .src{font-size:13px;color:var(--muted);margin-top:6px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:24px 20px 12px;margin:28px 0;}
+  svg{width:100%;height:auto;display:block;}
+  .box-t{font-weight:500;font-size:14px;}
+  .box-s{font-weight:400;font-size:12px;}
+  .conn{stroke:var(--conn);stroke-width:1.6;fill:none;}
+  .conn.dash{stroke-dasharray:6 5;}
+  .clab{font-weight:500;font-size:11.5px;fill:var(--muted);}
+  .legend{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:14px 4px 6px;}
+  .legend span{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;}
+  .lsw{width:26px;height:0;border-top:2px solid var(--conn);display:inline-block;}
+  .lsw.dash{border-top:2px dashed var(--conn);}
+  .legdiv{width:1px;height:16px;background:var(--line);}
+  h2{font-size:20px;font-weight:600;margin:40px 0 6px;letter-spacing:-0.01em;}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px;}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:#fbfaf6;font-weight:600;font-size:13px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.04em;}
+  tr:last-child td{border-bottom:none;}
+  td.from{font-weight:500;white-space:nowrap;}
+  td.to{font-weight:500;}
+  .note{font-size:13px;color:var(--muted);margin-top:18px;padding:14px 16px;
+    background:#fbfaf6;border:1px solid var(--line);border-radius:10px;}
+  .pill{display:inline-block;font-size:11px;font-weight:500;padding:1px 8px;border-radius:20px;
+    background:var(--gray-f);color:var(--gray-t);margin-left:6px;}
+  .tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap;}
+  .tag.doc{background:var(--teal-f);color:var(--teal-t);}
+  .tag.imp{background:var(--gray-f);color:var(--gray-s);}
+  .tag.gap{background:var(--coral-f);color:var(--coral-t);}
+  td.ty{white-space:nowrap;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>TikTok for Business — platform relation tree</h1>
+    <p>The 13 platforms in the localization sheet (F2→R2), mapped by tier and by how they hand users to one another — e.g. the Shop Ads tab in Seller Center opening Ads Manager.</p>
+    <p class="src">Source: localization tracking sheet · column “Platform &amp; Interface” · research June 2026</p>
+  </header>
+
+  <div class="card">
+    <svg viewBox="0 0 680 632" role="img" xmlns="http://www.w3.org/2000/svg">
+      <title>TikTok for Business platform relation tree</title>
+      <desc>Business Center is the central hub managing Ads Manager, Shop Seller Center and Market Scope. A creative tier holds TikTok One (containing Symphony Creative Studio), Creative Center and Creative Exchange. A developer tier holds API for Business and Business App Center. A surface tier holds the TikTok app, Ad Library and Shopify. Shop Seller Center's Shop Ads tab opens Ads Manager; creatives flow from TikTok One into Ads Manager; ads serve on the TikTok app.</desc>
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- backbone: Business Center to ops tier -->
+      <path class="conn" d="M300,178 L150,222" marker-end="url(#arrow)"/>
+      <path class="conn" d="M340,178 L340,222" marker-end="url(#arrow)"/>
+      <path class="conn" d="M380,178 L530,222" marker-end="url(#arrow)"/>
+
+      <!-- ads serve on TikTok app (implied) -->
+      <path class="conn dash" d="M132,222 L255,96" marker-end="url(#arrow)"/>
+      <text class="clab" x="168" y="150" text-anchor="start">ads serve</text>
+
+      <!-- Shop Ads tab: Seller Center to Ads Manager (documented) -->
+      <path class="conn" d="M247,247 L227,247" marker-end="url(#arrow)"/>
+      <text class="clab" x="300" y="205" text-anchor="middle">Shop Ads tab</text>
+
+      <!-- Market Scope store diagnosis reads shop (implied) -->
+      <path class="conn dash" d="M455,247 L435,247" marker-end="url(#arrow)"/>
+      <text class="clab" x="424" y="213" text-anchor="middle">store diagnosis</text>
+
+      <!-- creatives: TikTok One to Ads Manager -->
+      <path class="conn" d="M132,316 L132,274" marker-end="url(#arrow)"/>
+      <text class="clab" x="140" y="300" text-anchor="start">creatives</text>
+
+      <!-- TikTok One contains Symphony -->
+      <path class="conn" d="M132,366 L132,398" marker-end="url(#arrow)"/>
+      <text class="clab" x="140" y="387" text-anchor="start">contains</text>
+
+      <!-- API powers App Center -->
+      <path class="conn" d="M320,495 L360,495" marker-end="url(#arrow)"/>
+      <text class="clab" x="340" y="461" text-anchor="middle">powers</text>
+
+      <!-- ===== NODES ===== -->
+      <!-- TikTok app -->
+      <g>
+        <rect x="265" y="44" width="150" height="50" rx="9" fill="var(--gray-f)" stroke="var(--gray-s)"/>
+        <text class="box-t" x="340" y="67" text-anchor="middle" fill="var(--gray-t)">TikTok</text>
+        <text class="box-s" x="340" y="84" text-anchor="middle" fill="var(--gray-s)">consumer ad &amp; shop surface</text>
+      </g>
+      <!-- Business Center -->
+      <g>
+        <rect x="250" y="128" width="180" height="50" rx="9" fill="var(--purple-f)" stroke="var(--purple-s)"/>
+        <text class="box-t" x="340" y="151" text-anchor="middle" fill="var(--purple-t)">TikTok Business Center</text>
+        <text class="box-s" x="340" y="168" text-anchor="middle" fill="var(--purple-s)">central account &amp; asset hub</text>
+      </g>
+      <!-- Ads Manager -->
+      <g>
+        <rect x="40" y="222" width="185" height="50" rx="9" fill="var(--teal-f)" stroke="var(--teal-s)"/>
+        <text class="box-t" x="132" y="245" text-anchor="middle" fill="var(--teal-t)">TikTok Ads Manager</text>
+        <text class="box-s" x="132" y="262" text-anchor="middle" fill="var(--teal-s)">campaigns &amp; ad buying</text>
+      </g>
+      <!-- Seller Center -->
+      <g>
+        <rect x="247" y="222" width="186" height="50" rx="9" fill="var(--teal-f)" stroke="var(--teal-s)"/>
+        <text class="box-t" x="340" y="245" text-anchor="middle" fill="var(--teal-t)">Shop Seller Center</text>
+        <text class="box-s" x="340" y="262" text-anchor="middle" fill="var(--teal-s)">shop ops · Shop Ads tab</text>
+      </g>
+      <!-- Market Scope -->
+      <g>
+        <rect x="455" y="222" width="185" height="50" rx="9" fill="var(--teal-f)" stroke="var(--teal-s)"/>
+        <text class="box-t" x="547" y="245" text-anchor="middle" fill="var(--teal-t)">TikTok Market Scope</text>
+        <text class="box-s" x="547" y="262" text-anchor="middle" fill="var(--teal-s)">full-funnel analytics</text>
+      </g>
+      <!-- TikTok One -->
+      <g>
+        <rect x="40" y="316" width="185" height="50" rx="9" fill="var(--coral-f)" stroke="var(--coral-s)"/>
+        <text class="box-t" x="132" y="339" text-anchor="middle" fill="var(--coral-t)">TikTok One</text>
+        <text class="box-s" x="132" y="356" text-anchor="middle" fill="var(--coral-s)">unified creative hub</text>
+      </g>
+      <!-- Creative Center -->
+      <g>
+        <rect x="247" y="316" width="186" height="50" rx="9" fill="var(--coral-f)" stroke="var(--coral-s)"/>
+        <text class="box-t" x="340" y="339" text-anchor="middle" fill="var(--coral-t)">TikTok Creative Center</text>
+        <text class="box-s" x="340" y="356" text-anchor="middle" fill="var(--coral-s)">trends &amp; inspiration</text>
+      </g>
+      <!-- Creative Exchange -->
+      <g>
+        <rect x="455" y="316" width="185" height="50" rx="9" fill="var(--coral-f)" stroke="var(--coral-s)"/>
+        <text class="box-t" x="547" y="339" text-anchor="middle" fill="var(--coral-t)">TikTok Creative Exchange</text>
+        <text class="box-s" x="547" y="356" text-anchor="middle" fill="var(--coral-s)">production partners</text>
+      </g>
+      <!-- Symphony -->
+      <g>
+        <rect x="40" y="398" width="185" height="46" rx="9" fill="var(--coral-f)" stroke="var(--coral-s)"/>
+        <text class="box-t" x="132" y="419" text-anchor="middle" fill="var(--coral-t)">Symphony Creative Studio</text>
+        <text class="box-s" x="132" y="435" text-anchor="middle" fill="var(--coral-s)">AI video generation</text>
+      </g>
+      <!-- API for Business -->
+      <g>
+        <rect x="130" y="470" width="190" height="50" rx="9" fill="var(--blue-f)" stroke="var(--blue-s)"/>
+        <text class="box-t" x="225" y="493" text-anchor="middle" fill="var(--blue-t)">TikTok API for Business</text>
+        <text class="box-s" x="225" y="510" text-anchor="middle" fill="var(--blue-s)">programmatic ads access</text>
+      </g>
+      <!-- App Center -->
+      <g>
+        <rect x="360" y="470" width="190" height="50" rx="9" fill="var(--blue-f)" stroke="var(--blue-s)"/>
+        <text class="box-t" x="455" y="493" text-anchor="middle" fill="var(--blue-t)">Business App Center</text>
+        <text class="box-s" x="455" y="510" text-anchor="middle" fill="var(--blue-s)">3rd-party app marketplace</text>
+      </g>
+      <!-- Ad Library -->
+      <g>
+        <rect x="247" y="560" width="186" height="50" rx="9" fill="var(--gray-f)" stroke="var(--gray-s)"/>
+        <text class="box-t" x="340" y="583" text-anchor="middle" fill="var(--gray-t)">Ad Library</text>
+        <text class="box-s" x="340" y="600" text-anchor="middle" fill="var(--gray-s)">public ad transparency</text>
+      </g>
+      <!-- Shopify Channel App (SCA) -->
+      <g>
+        <rect x="455" y="560" width="185" height="50" rx="9" fill="var(--gray-f)" stroke="var(--gray-s)"/>
+        <text class="box-t" x="547" y="583" text-anchor="middle" fill="var(--gray-t)">Shopify Channel App</text>
+        <text class="box-s" x="547" y="600" text-anchor="middle" fill="var(--gray-s)">(SCA) · TikTok ads + shop</text>
+      </g>
+    </svg>
+
+    <div class="legend">
+      <span><i class="sw" style="background:var(--purple-s)"></i>Hub</span>
+      <span><i class="sw" style="background:var(--teal-s)"></i>Ads &amp; commerce ops</span>
+      <span><i class="sw" style="background:var(--coral-s)"></i>Creative tools</span>
+      <span><i class="sw" style="background:var(--blue-s)"></i>Developer</span>
+      <span><i class="sw" style="background:var(--gray-s)"></i>Surfaces &amp; external</span>
+      <i class="legdiv"></i>
+      <span><i class="lsw"></i>Documented handoff</span>
+      <span><i class="lsw dash"></i>Implied link</span>
+    </div>
+  </div>
+
+  <h2>Key interconnections</h2>
+  <p class="sub">Every directed link between the platforms. <span class="tag doc">Documented</span> = stated in TikTok help articles; <span class="tag imp">Implied</span> = consistent across sources but not a single explicit click.</p>
+  <table>
+    <thead>
+      <tr><th>From</th><th>Connection / mechanism</th><th>To</th><th>Type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="from">Business Center</td><td>The <strong>Accounts</strong> tab links 5 account types — Advertiser (→ Ads Manager), TikTok, TikTok One, Shops (→ Seller Center), Market Scope — plus member &amp; asset management</td><td class="to">Ads Manager · TikTok app · TikTok One · Seller Center · Market Scope</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Business Center</td><td>Each Advertiser-account row has a <strong>“Go to Ads Manager”</strong> button that opens that ad account in a new tab</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Shop Seller Center</td><td>The <strong>Shop Ads tab</strong> opens <strong>GMV Max</strong> (TikTok Shop’s Shop Ads product), links the shop + ad account, and hands the seller into campaign creation; GMV Max also surfaces in the Ads Manager left nav</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Business Center</td><td>Reached via <strong>Accounts → TikTok One accounts</strong> linking (shared TikTok-for-Business login); main entry path to TikTok One</td><td class="to">TikTok One</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">TikTok One</td><td>Content Suite <strong>one-click Spark Ads authorization</strong>, synced automatically to TTAM</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Ads Manager</td><td><strong>More tools → Creative</strong> menu links out to “TikTok Symphony” and Content Suite (open in a new tab)</td><td class="to">Symphony Creative Studio · TikTok One</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">TikTok One</td><td>Contains the AI video generator</td><td class="to">Symphony Creative Studio</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Creative Exchange</td><td>Migrating in as <strong>Partner Exchange</strong></td><td class="to">TikTok One</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Creative Center</td><td>Symphony Assistant research &amp; scripting feeds production</td><td class="to">TikTok One · Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">API for Business</td><td>Programmatic campaign management at scale</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">API for Business</td><td>Powers the integrations behind 3rd-party apps</td><td class="to">Business App Center</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Business App Center</td><td>3rd-party apps plug into the campaign-creation flow</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Shopify Channel App (SCA)</td><td><strong>One-click setup</strong> links the TikTok for Business account, installs the Pixel + Events API, and syncs the product catalog</td><td class="to">Business Center · Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Shopify Channel App (SCA)</td><td>TikTok-hosted <strong>Conversion / Catalog ad creation</strong> to the Shopify store (not Shop Ads — those run via Seller Center) + campaign management</td><td class="to">Ads Manager</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Shopify Channel App (SCA)</td><td>Links the Shopify store to TikTok Shop; surfaced as a peer “TikTok Shop” card</td><td class="to">Shop Seller Center</td><td class="ty"><span class="tag doc">Documented</span></td></tr>
+      <tr><td class="from">Shop Seller Center</td><td>Products surface as shoppable videos / Shop tab</td><td class="to">TikTok app</td><td class="ty"><span class="tag imp">Implied</span></td></tr>
+      <tr><td class="from">Ads Manager</td><td>Campaigns deliver ads to the feed</td><td class="to">TikTok app</td><td class="ty"><span class="tag imp">Implied</span></td></tr>
+      <tr><td class="from">Ads Manager</td><td>Live ads published for public transparency</td><td class="to">Ad Library</td><td class="ty"><span class="tag imp">Implied</span></td></tr>
+      <tr><td class="from">Market Scope</td><td><strong>Store Diagnosis</strong> module reads shop data</td><td class="to">Shop Seller Center</td><td class="ty"><span class="tag imp">Implied</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Language coverage vs Ads Manager</h2>
+  <p class="sub">How each connected tool’s supported-language set lines up with TTAM’s 19 languages (from the sheet’s matrix).</p>
+  <table>
+    <thead>
+      <tr><th>Tool</th><th>Relation to TTAM</th><th>Coverage</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="from">Business Center</td><td>Identical language set</td><td>19 / 19</td><td class="ty"><span class="tag doc">Full parity</span></td></tr>
+      <tr><td class="from">Market Scope</td><td>Subset of TTAM</td><td>7 / 19 — all covered</td><td class="ty"><span class="tag doc">No gap</span></td></tr>
+      <tr><td class="from">Symphony Creative Studio</td><td>Subset of TTAM</td><td>18 / 19</td><td class="ty"><span class="tag gap">Gap: Arabic</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Arabic is the only gap.</strong> Symphony Creative Studio covers 18 of TTAM’s 19 languages — all except <strong>Arabic</strong>. This surfaces right at the new <strong>More tools → TikTok Symphony</strong> handoff: an advertiser running Ads Manager in Arabic lands on Symphony with no Arabic UI and falls back to a default.<span class="pill">P0 · SA / UAE / EG</span>
+  </div>
+
+  <div class="note">
+    Two notes from the sheet itself: <strong>(1)</strong> the <em>Shopify</em> column is really the <strong>Shopify Channel App (SCA)</strong> — TikTok’s embedded sales-channel app inside Shopify Admin — and the cell links to its Starling localization project, not shopify.com.<span class="pill">data quirk</span> <strong>(2)</strong> The column header is “Platform &amp; Interface”, confirming these 13 are the surfaces being localized.
+  </div>
+</div>
+</body>
+</html>
